@@ -3,6 +3,10 @@
 Four interactive simulations in the browser: three.js for the tube and bench,
 Canvas2D for the instruments, no install and no build step.
 
+**▶ [Run it without cloning anything](https://holla2040.github.io/Pentode-6AU6-Lab/)**
+
+Locally:
+
 ```
 python3 -m http.server 8000 --directory web
 # then open http://localhost:8000/

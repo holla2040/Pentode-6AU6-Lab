@@ -1,12 +1,20 @@
 # Interactive Pentode Simulation — 6AU6
 
-> **Run it → [`web/`](web/README.md)** — four interactive simulations in the
-> browser, no install:
-> `python3 -m http.server 8000 --directory web`
+> ### ▶ [**Run it in your browser**](https://holla2040.github.io/Pentode-6AU6-Lab/)
+> No install, no clone, no Blender — four live simulations of a 6AU6 pentode.
 >
 > **Learn it → [LESSONS.md](LESSONS.md)** — a guided 14-lesson path through all
 > four, from thermionic emission to bias choice and distortion character in
-> audio and guitar amplifier stages.
+> audio and guitar amplifier stages. Every lesson's settings are a link.
+
+| | Open it | What it teaches |
+|---|---|---|
+| The naked tube | [▶ run](https://holla2040.github.io/Pentode-6AU6-Lab/web/#pentode) | electrons, grids, why the screen and suppressor exist |
+| RC amplifier | [▶ run](https://holla2040.github.io/Pentode-6AU6-Lab/web/#amp) | load lines, gain, the screen resistor and its bypass |
+| Self-biased stage | [▶ run](https://holla2040.github.io/Pentode-6AU6-Lab/web/#cb) | how real stages find their own bias |
+| Living datasheet | [▶ run](https://holla2040.github.io/Pentode-6AU6-Lab/web/#curves) | bias, swing and compression on the Ip(Vp) plane |
+
+Or run it locally: `python3 -m http.server 8000 --directory web`
 
 The follow-on to [Blender-Triode-6SN7](https://github.com/holla2040/Blender-Triode-6SN7):
 a physically-motivated teaching model of a **pentode**, with the screen grid,
@@ -22,18 +30,14 @@ halves. This photo set the model's geometry.*
 ![6AU6 grid winding and plate](img/6AU6-170424-120556.jpg)
 *Grid winding on its side rails, with the dimpled plate behind.*
 
-## The four simulations
+## Linking to an experiment
 
-| | Link | What it teaches |
-|---|---|---|
-| The naked tube | `web/#pentode` | electrons, grids, why the screen and suppressor exist |
-| RC amplifier | `web/#amp` | load lines, gain, the screen resistor and its bypass |
-| Self-biased stage | `web/#cb` | how real stages find their own bias |
-| Living datasheet | `web/#curves` | bias, swing and compression on the Ip(Vp) plane |
+Any control can be set from the query string, so an operating point is a URL.
+The tetrode kink of Lesson 4, for instance:
 
-Pick one from the dropdown, or link straight to it. Any control can go in the
-URL, so a lesson's settings are a link:
-`web/?vg2=150&vp=60&sup=0#pentode` is the tetrode kink.
+[`…/web/?vg2=150&vp=60&sup=0#pentode`](https://holla2040.github.io/Pentode-6AU6-Lab/web/?vg2=150&vp=60&sup=0#pentode)
+
+`view` takes `TOP`, `INSIDE`, `OVER`, `BENCH`; booleans take `0`/`1`.
 
 ## Files
 

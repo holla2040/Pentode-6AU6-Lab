@@ -15,14 +15,15 @@ or the moving plate-characteristics display.
 | The self-biased stage | `web/#cb` | how real stages find their own bias |
 | The living datasheet | `web/#curves` | seeing bias, swing, and compression on the Ip(Vp) plane |
 
-Serve the page once (`python3 -m http.server 8000 --directory web`) and leave
-it open — see [web/README.md](web/README.md). Pick a sim from the dropdown,
+Open the [live page](https://holla2040.github.io/Pentode-6AU6-Lab/) and leave
+it up — or serve it locally with
+`python3 -m http.server 8000 --directory web`. Pick a sim from the dropdown,
 press **Run / Pause**, and drag sliders while it plays. Use **Reset** rather
 than reloading; the sim is stateful.
 
 Every lesson's **Set:** line can also go straight in the URL, so a lesson is a
 link — the tetrode kink of Lesson 4 is
-`web/?vg2=150&vp=60&sup=0#pentode`.
+[`?vg2=150&vp=60&sup=0#pentode`](https://holla2040.github.io/Pentode-6AU6-Lab/web/?vg2=150&vp=60&sup=0#pentode).
 
 Unlike a real amp, each sim has already settled by the time you see it: the
 perveance calibration and the bypass capacitors are run forward before the
