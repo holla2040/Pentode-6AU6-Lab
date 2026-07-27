@@ -343,6 +343,17 @@ export function pushParticles(T, S) {
 const fovFor = (lens, aspect) =>
   2 * Math.atan(18 / (lens * Math.max(aspect, 1))) * 180 / Math.PI;
 
+/**
+ * Blender's ortho_scale spans the LONG edge under AUTO sensor fit, exactly as
+ * the sensor width does for a perspective lens. Fixing the width unconditionally
+ * is right only in landscape — in portrait it over-widens the frame and the
+ * subject shrinks (2x too small at a 1:2 viewport).
+ */
+const orthoHalf = (scale, aspect) => {
+  const halfW = (scale / 2) * Math.min(aspect, 1);
+  return [halfW, halfW / aspect];
+};
+
 export const VIEWS = {
   // top camera inside the envelope just below the top mica: cross-section view.
   // Looking straight down needs its own up vector — with the scene's +Z up,
@@ -362,9 +373,8 @@ export function makeCameras(aspect) {
   for (const [k, v] of Object.entries(VIEWS)) {
     let cam;
     if (v.ortho) {
-      const s = v.ortho;
-      cam = new THREE.OrthographicCamera(-s / 2, s / 2, s / (2 * aspect),
-                                         -s / (2 * aspect), v.near, 200);
+      const [hw, hh] = orthoHalf(v.ortho, aspect);
+      cam = new THREE.OrthographicCamera(-hw, hw, hh, -hh, v.near, 200);
     } else {
       cam = new THREE.PerspectiveCamera(fovFor(v.lens, aspect), aspect,
                                         v.near, 200);
@@ -381,9 +391,9 @@ export function resizeCameras(cams, aspect) {
   for (const [k, cam] of Object.entries(cams)) {
     const v = VIEWS[k];
     if (v.ortho) {
-      const s = v.ortho;
-      cam.left = -s / 2; cam.right = s / 2;
-      cam.top = s / (2 * aspect); cam.bottom = -s / (2 * aspect);
+      const [hw, hh] = orthoHalf(v.ortho, aspect);
+      cam.left = -hw; cam.right = hw;
+      cam.top = hh; cam.bottom = -hh;
     } else {
       cam.fov = fovFor(v.lens, aspect);
       cam.aspect = aspect;
