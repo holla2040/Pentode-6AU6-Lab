@@ -10,20 +10,33 @@ or the moving plate-characteristics display.
 
 | Sim | Open | What it teaches |
 |---|---|---|
-| The naked tube | `pentode_sim.blend` | electrons, grids, why the screen and suppressor exist |
-| The RC amplifier | `amplifier/pentode_amp_sim.blend` | load lines, gain, the screen resistor and its bypass |
-| The self-biased stage | `amplifier-cathode-bias/pentode_cb_amp_sim.blend` | how real stages find their own bias |
-| The living datasheet | `amplifier-plate-characteristics/plate_curves_sim.blend` | seeing bias, swing, and compression on the Ip(Vp) plane |
+| The naked tube | `web/#pentode` | electrons, grids, why the screen and suppressor exist |
+| The RC amplifier | `web/#amp` | load lines, gain, the screen resistor and its bypass |
+| The self-biased stage | `web/#cb` | how real stages find their own bias |
+| The living datasheet | `web/#curves` | seeing bias, swing, and compression on the Ip(Vp) plane |
 
-Every sim: open the `.blend`, Text Editor → **Run Script** once, then
-N-panel sidebar → the sim's tab → **Run / Pause**. Drag sliders live. Use
-**Reset** rather than scrubbing the timeline, and give a fresh build its
-first minute to settle — the calibration and the capacitors are charging,
-exactly like a real amp warming up.
+Open the [live page](https://holla2040.github.io/Pentode-6AU6-Lab/) and leave
+it up — or serve it locally with
+`python3 -m http.server 8000 --directory web`. Pick a sim from the dropdown,
+press **Run / Pause**, and drag sliders while it plays. Use **Reset** rather
+than reloading; the sim is stateful.
+
+Every lesson's **Set:** line can also go straight in the URL, so a lesson is a
+link — the tetrode kink of Lesson 4 is
+[`?vg2=150&vp=60&sup=0#pentode`](https://holla2040.github.io/Pentode-6AU6-Lab/web/?vg2=150&vp=60&sup=0#pentode).
+
+Unlike a real amp, each sim has already settled by the time you see it: the
+perveance calibration and the bypass capacitors are run forward before the
+first frame. Add `&warm=0` if you would rather watch one warm up from cold.
+
+> The original Blender build lives in
+> [`blender-legacy/`](blender-legacy/README.md) and is no longer maintained.
+> It is kept because it is still the physics reference the browser engine is
+> checked against.
 
 ---
 
-## Part I — The tube itself (`pentode_sim.blend`)
+## Part I — The tube itself (`web/#pentode`)
 
 ### Lesson 1 — Current is emission, and emission is temperature
 
@@ -88,7 +101,7 @@ the screen voltage cleanly — which large output-stage swings routinely do.
 
 ---
 
-## Part II — Wiring it into an amplifier (`amplifier/pentode_amp_sim.blend`)
+## Part II — Wiring it into an amplifier (`web/#amp`)
 
 ### Lesson 5 — The load line: the resistor does the volts
 
@@ -112,7 +125,7 @@ in Lesson 8.
 readout at R_L = 100k, then slide to 300k.
 
 **Watch:** ~32× becomes ~97×. Try the same trick on the companion triode
-amplifier (Blender-Triode-6SN7) and the gain barely moves off ~13×.
+amplifier (the 6SN7 triode project) and the gain barely moves off ~13×.
 
 **The point:** a triode's gain is pinned near its μ; the pentode is a
 current source, so gain ≈ gm·R_L — buy as much gain as you can afford in
@@ -138,7 +151,7 @@ same two-way self-regulation becomes the star of Lessons 11–12.
 ## Part III — Bias: choosing where the stage lives
 
 ### Lesson 8 — See the bias point: a dot on a line
-(`amplifier-plate-characteristics/plate_curves_sim.blend`)
+(`web/#curves`)
 
 **Set:** amplitude 0, bypass on, defaults otherwise. Now sweep **DC
 offset** from 0 to −5 V slowly and watch the plate-characteristics
@@ -163,7 +176,7 @@ one choice:
   knee early — expect the bottom of the output to compress first.
 
 ### Lesson 9 — Self-bias: the stage that finds its own operating point
-(`amplifier-cathode-bias/pentode_cb_amp_sim.blend`)
+(`web/#cb`)
 
 **Set:** defaults (R_k 1k, both bypass caps on, DC offset 0). Watch Vk on
 the meter. Then sweep **R_k** 0.5k → 5k.
@@ -234,7 +247,7 @@ Also try amplitude 8 V at DC −3: both edges at once — full square-ish
 drive, the classic saturated pentode rasp.
 
 ### Lesson 12 — Screen compression: the sag that guitar players call "feel"
-(`amplifier-plate-characteristics/plate_curves_sim.blend`)
+(`web/#curves`)
 
 **Set:** defaults, **bypass OFF**, amplitude 2 V. Watch the green family
 and the Vg2 readout for a few cycles. Then check the bypass box
@@ -264,7 +277,7 @@ guitar designers *size* it. R_g2 is your sag-depth knob: sweep it toward
 1M with the bypass off and watch the family's breathing deepen.
 
 ### Lesson 13 — Cathode feedback: the other bypass cap
-(`amplifier-cathode-bias/pentode_cb_amp_sim.blend`)
+(`web/#cb`)
 
 **Set:** amplitude 0.5, all caps on. Note the gain (~16×). Uncheck the
 **cathode** bypass only. Then instead uncheck the **screen** bypass only.
