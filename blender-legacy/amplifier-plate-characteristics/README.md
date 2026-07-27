@@ -1,7 +1,7 @@
 # Pentode Amplifier with a Live Plate-Characteristics Display
 
 > Lessons 8 and 12 of the repo's guided course use this display:
-> **[LESSONS.md](../LESSONS.md)**.
+> **[LESSONS.md](../../LESSONS.md)**.
 
 The [screen-resistor amplifier](../amplifier/README.md) with the instrument
 a datasheet can't print: a **plate-characteristics plot whose curves move**.
