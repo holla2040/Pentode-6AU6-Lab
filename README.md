@@ -16,7 +16,8 @@
 
 Or run it locally: `python3 -m http.server 8000 --directory web`
 
-The follow-on to [Blender-Triode-6SN7](https://github.com/holla2040/Blender-Triode-6SN7):
+The follow-on to [Triode-6SN7-Lab](https://github.com/holla2040/Triode-6SN7-Lab)
+([run it](https://holla2040.github.io/Triode-6SN7-Lab/)):
 a physically-motivated teaching model of a **pentode**, with the screen grid,
 suppressor grid, secondary emission, and a **tetrode-mode toggle** so students
 can see the kink the suppressor was invented to fix. Geometry is a stylized
