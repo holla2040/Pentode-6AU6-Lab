@@ -129,6 +129,19 @@ the calibration and the bypass capacitors have settled by the time you look.
 - **Instruments are Canvas2D**, not curve and text objects. Sharper, and it
   replaces `_build_scope`, `_push_traces`, `_build_tracer`, `_push_curves`,
   `_write_pc_spline`, `_update_load_line`, `_ensure_fam_labels` and `_text`.
+- **The scope and tracer sit parallel to the Bench camera's image plane**
+  (`FACE_CAM` in `bench.js`), not at Blender's 48°. Only a plane parallel to
+  the image plane projects as a true rectangle — turning a panel to *face* the
+  lens is a different angle and still keystones it.
+- **The two instruments are one matched pair**: same size, same plane, same
+  depth. The tracer sits further out than a mirror of the scope would, because
+  the R_L-to-supply wire drop at x=2.95 and the supply's ground wire at x=3.45
+  are both nearer the camera than the instrument plane and so read *outboard*
+  of their own x — a mirrored panel would have them down its lower left.
+  Matching the scope's portrait panel is also why the plot box is 10 × 8
+  divisions of 0.26 × 0.45 rather than square ones: a square graticule adrift
+  in a tall empty panel looked worse, and the extra height buys resolution on
+  the current axis, where the load line and the operating dot live.
 - **Lights are spots, not area lamps.** three.js `RectAreaLight` cannot cast
   shadows, and a directional light has no distance falloff — which lit the
   plate bore far too hot. Spots keep the 1/d² decay an area lamp six units away

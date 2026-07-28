@@ -7,11 +7,35 @@
 // _text with a few fillText and lineTo calls, and comes out sharper.
 
 import * as THREE from "three";
-import { principled, emission } from "./tube.js";
+import { principled, emission, VIEWS } from "./tube.js";
 import { pcModelMa, PC_FAMILY_EC1, PC_VMAX, PC_IMAX, SCOPE_N } from "./engine.js";
 
-const PC_W = 3.0, PC_H = 2.4;          // plot box: 10 x 8 divisions
-const rad = (d) => d * Math.PI / 180;
+// Tracer plot box: 10 x 8 divisions, sized to fill a panel the same size as
+// the scope. That panel is portrait, so the divisions come out taller than
+// they are wide — the alternative was a square graticule adrift in a tall
+// empty panel. The extra height buys resolution on the current axis, which is
+// where the load line and the operating dot live.
+const PC_W = 2.6, PC_H = 3.6;
+const PC_L = -PC_W / 2, PC_R = PC_W / 2;   // plot box edges, in panel units
+const PC_B = -PC_H / 2, PC_T = PC_H / 2;
+
+/**
+ * rotZ that leaves an instrument panel parallel to the Bench camera's image
+ * plane, which is the only orientation that projects as a true rectangle.
+ *
+ * Aiming a panel AT the camera is a different angle and is not what you want:
+ * a panel off to one side, turned to face the lens, is still oblique to the
+ * image plane and still projects keystoned. Parallel planes never keystone,
+ * however far off-axis they sit. Derived from VIEWS.BENCH so moving the
+ * camera cannot silently leave the instruments skewed.
+ *
+ * A panel's face normal is (sin rotZ, -cos rotZ, 0); setting that antiparallel
+ * to the camera's forward direction gives the atan2 below.
+ */
+const FACE_CAM = (() => {
+  const { pos, target } = VIEWS.BENCH;
+  return Math.atan2(-(target[0] - pos[0]), target[1] - pos[1]);
+})();
 
 // resistor colour code, digits 0-9
 const BAND_RGB = [[0.02, 0.02, 0.02], [0.28, 0.15, 0.06], [0.75, 0.05, 0.03],
@@ -181,9 +205,8 @@ function drawTracer(P, S, p) {
   g.fillStyle = "#02060a";
   g.fillRect(0, 0, P.canvas.width, P.canvas.height);
   g.fillStyle = "#03130a";
-  g.fillRect(P.X(-PC_W / 2), P.Y(PC_H / 2),
-             P.X(PC_W / 2) - P.X(-PC_W / 2), P.Y(-PC_H / 2) - P.Y(PC_H / 2));
-  gridLines(P, -PC_W / 2, PC_W / 2, -PC_H / 2, PC_H / 2, 0.3, 0.3, GRAT);
+  g.fillRect(P.X(PC_L), P.Y(PC_T), P.X(PC_R) - P.X(PC_L), P.Y(PC_B) - P.Y(PC_T));
+  gridLines(P, PC_L, PC_R, PC_B, PC_T, PC_W / 10, PC_H / 8, GRAT);
 
   // the family, at the INSTANTANEOUS screen voltage
   const vps = [];
@@ -198,8 +221,10 @@ function drawTracer(P, S, p) {
       if (i === 0) g.moveTo(X, Y); else g.lineTo(X, Y);
     }
     g.stroke();
-    label(P, `${ec1.toFixed(0)}`, PC_W / 2 + 0.07, pcy(ys[ys.length - 1]),
-          0.10, "#2fbf4a");
+    // inside the right edge, not outside it — the panel clears the plot box by
+    // only 0.22 a side, and an outboard label runs off the canvas
+    label(P, `${ec1.toFixed(0)}`, PC_R - 0.05, pcy(ys[ys.length - 1]),
+          0.10, "#2fbf4a", "right");
   }
 
   // static load line from (B+, 0) to (0, B+/RL), clipped to the plot box.
@@ -224,12 +249,14 @@ function drawTracer(P, S, p) {
   dot(S.vpRef !== undefined ? S.vpRef : S.vp, "#b00808", 7);
   dot(S.vp, "#ff4033", 9);
 
-  label(P, "PLATE CHARACTERISTICS", -1.55, PC_H / 2 + 0.22, 0.14, WHITE);
-  label(P, `Vs = ${S.vg2.toFixed(0)} V`, 0.55, -PC_H / 2 - 0.30, 0.15, GREEN);
-  label(P, "Vg 0..-5V (family moves w/ Vs)", -1.65, -PC_H / 2 - 0.30, 0.10, GREEN);
-  label(P, "0", -1.55, -PC_H / 2 - 0.09, 0.09, WHITE);
-  label(P, "500V (50/div)", 0.55, -PC_H / 2 - 0.09, 0.09, WHITE);
-  label(P, "4mA (0.5/div)", -1.62, PC_H / 2 - 0.02, 0.09, WHITE);
+  // anchored to the plot box, not to the canvas, so resizing the panel does
+  // not leave the captions stranded
+  label(P, "PLATE CHARACTERISTICS", PC_L, PC_T + 0.30, 0.125, WHITE);
+  label(P, "Vg 0..-5V (moves w/ Vs)", PC_L, PC_B - 0.32, 0.10, GREEN);
+  label(P, `Vs = ${S.vg2.toFixed(0)} V`, PC_R, PC_B - 0.32, 0.115, GREEN, "right");
+  label(P, "0", PC_L, PC_B - 0.11, 0.09, WHITE);
+  label(P, "500V (50/div)", PC_R, PC_B - 0.11, 0.09, WHITE, "right");
+  label(P, "4mA (0.5/div)", PC_L + 0.05, PC_T - 0.11, 0.09, WHITE);
   P.tex.needsUpdate = true;
 }
 
@@ -334,10 +361,18 @@ export function buildBench(scene) {
        0.018, mats.wire, B.kCap);
 
   // --- instruments
+  // Both instruments read as flat rectangles from the Bench view — see
+  // FACE_CAM. Blender's 48 deg on the scope aimed at ITS three-quarter bench
+  // camera, and from this head-on one it skewed by 31 deg.
   B.scope = panel(scene, { w: 3.05, h: 4.40, pos: [-3.9, 0.9, 1.15],
-                           rotZ: rad(48.0), px: 640 });
-  B.tracer = panel(scene, { w: 3.6, h: 3.1, pos: [4.1, 2.1, 1.45],
-                            rotZ: rad(16.0), px: 760 });
+                           rotZ: FACE_CAM, px: 640 });
+  // Same size and same plane as the scope — a matched pair of instruments.
+  // It sits further out than a mirror of the scope would, because the drop
+  // from R_L to the supply stands at x=2.95 and the supply's own ground wire
+  // at x=3.45: both are nearer the camera than the instrument plane, so they
+  // read OUTBOARD of their own x and would clip the tracer's lower left.
+  B.tracer = panel(scene, { w: 3.05, h: 4.40, pos: [5.25, 0.9, 1.15],
+                            rotZ: FACE_CAM, px: 640 });
   // the floating in-scene meters, at the Blender FONT objects' spots
   B.meter = panel(scene, { w: 2.6, h: 0.78, pos: [0.0, -1.58, -1.98],
                            rotZ: 0, px: 560, bare: true });
